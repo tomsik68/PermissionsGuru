@@ -8,53 +8,52 @@ package sk.tomsik68.permsguru;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 public enum EPermissions {
-	None(new PermissionService(){
+    NONE(new PermissionService() {
 
-		@Override
-		public boolean hasPermission(CommandSender player, String node) {
-			return true;
-		}
-	}),
-	OP(new PermissionService(){
-		@Override
-		public boolean hasPermission(CommandSender player, String node) {
-			return player.isOp();
-		}
-	}),
-	SP(new PermissionService(){
+        @Override
+        public boolean hasPermission(CommandSender player, String node) {
+            return true;
+        }
+    }), OP(new PermissionService() {
+        @Override
+        public boolean hasPermission(CommandSender player, String node) {
+            return player.isOp();
+        }
+    }), SP(new PermissionService() {
+        @Override
+        public boolean hasPermission(CommandSender player, String node) {
+            return player.hasPermission(node);
+        }
+    });
+    private final PermissionService p;
 
-		@Override
-		public boolean hasPermission(CommandSender player, String node) {
-			return player.hasPermission(node);
-		}
-	});
-	private final PermissionService p;
-	private EPermissions(PermissionService ps){
-		p = ps;
-	}
-	public boolean has(CommandSender sender,String node){
-		return sender.hasPermission(node);
-	}
-	public static EPermissions parse(String str){
-	    EPermissions result = EPermissions.None;
-	    try{
-	        result = EPermissions.valueOf(str);
-	    }catch(Exception e){
-	        try{
-	            result = EPermissions.valueOf(str.toUpperCase());
-	        }catch(Exception e1){
-	            Plugin[] plugins = Bukkit.getServer().getPluginManager().getPlugins();
-	            for(Plugin plugin : plugins){
-	                if(plugin.getName().contains("permissions")){
-	                    result = EPermissions.SP;
-	                }
-	            }
-	        }
-	    }
+    private EPermissions(PermissionService ps) {
+        p = ps;
+    }
+
+    public boolean has(CommandSender sender, String node) {
+        return p.hasPermission(sender, node);
+    }
+
+    public static EPermissions parse(String str) {
+        EPermissions result = EPermissions.NONE;
+        try {
+            result = EPermissions.valueOf(str);
+        } catch (Exception e) {
+            try {
+                result = EPermissions.valueOf(str.toUpperCase());
+            } catch (Exception e1) {
+                Plugin[] plugins = Bukkit.getServer().getPluginManager().getPlugins();
+                for (Plugin plugin : plugins) {
+                    if (plugin.getName().contains("permissions")) {
+                        result = EPermissions.SP;
+                    }
+                }
+            }
+        }
         return result;
-	}
+    }
 }
